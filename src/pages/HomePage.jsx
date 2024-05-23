@@ -8,7 +8,8 @@ import { BsCircleFill } from 'react-icons/bs';
 
 const HomePage = () => {
     const [todos, setTodos] = useState([]);
-    const [newTask, setNewTask] = useState('');
+    const [editMode, setEditMode] = useState(false);
+    const [currentTask, setCurrentTask] = useState({ id: null, task: '' });
 
     // get all tasks
     const getTasks = () => {
@@ -16,22 +17,32 @@ const HomePage = () => {
             .get('http://localhost:5000/getAll')
             .then((res) => {
                 setTodos(res.data);
-                window.location.reload();
+                // window.location.reload();
             })
             .catch((err) => {
                 console.log(err);
             });
     };
 
-    // edit task
-    const handleEditTask = (id, newTask) => {
-        setNewTask(...todos, newTask);
+    useEffect(() => {
+        getTasks();
+    }, []);
 
+    // edit task
+    const handleEditTask = (task) => {
+        setEditMode(true);
+        setCurrentTask({ id: task._id, task: task.task });
+    };
+    const handleUpdateTask = () => {
         axios
-            .post(`http://localhost:5000/edit/${id}`)
+            .put(`http://localhost:5000/edit/${currentTask.id}`, {
+                task: currentTask.task,
+            })
             .then((res) => {
                 console.log(res);
-                window.location.reload();
+                setEditMode(false);
+                setCurrentTask({ id: null, task: '' });
+                getTasks();
             })
             .catch((err) => {
                 console.log(err);
@@ -72,6 +83,30 @@ const HomePage = () => {
             {/* edit task page */}
             <CreateTaskPage getTasks={getTasks} />
 
+            {/* edit task */}
+            {editMode && (
+                <div className='mt-5'>
+                    <input
+                        autoFocus
+                        type='text'
+                        className='w-[20vw] px-5 py-3 border border-black text-lg rounded-l-lg'
+                        value={currentTask.task}
+                        onChange={(e) =>
+                            setCurrentTask({
+                                ...currentTask,
+                                task: e.target.value,
+                            })
+                        }
+                    />
+                    <button
+                        className='px-5 w-[9vw] py-3 border border-black rounded-r-lg text-lg hover:bg-black hover:text-white transition duration-300'
+                        onClick={handleUpdateTask}
+                    >
+                        Update
+                    </button>
+                </div>
+            )}
+
             {/* display task */}
             {todos.length === 0 ? (
                 // no task
@@ -111,20 +146,20 @@ const HomePage = () => {
                                 )}
 
                                 {/* name task */}
-                                <label
+                                <p
                                     className={
                                         todo.checkDone ? 'line-through' : ''
                                     }
                                     htmlFor={inputId}
                                 >
                                     {todo.task}
-                                </label>
+                                </p>
                             </div>
 
                             {/* buttons: edit & delete */}
                             <div className='flex justify-center items-center gap-5 text-black mr-10'>
                                 <CiEdit
-                                    onClick={() => handleEditTask(todo._id)}
+                                    onClick={() => handleEditTask(todo)}
                                     title='Edit this task'
                                     size={35}
                                     className=' bg-white hover:cursor-pointer rounded-lg p-1'
