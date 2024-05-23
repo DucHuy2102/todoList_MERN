@@ -3,11 +3,12 @@ import CreateTaskPage from './CreateTaskPage';
 import axios from 'axios';
 import { CiEdit } from 'react-icons/ci';
 import { MdDelete } from 'react-icons/md';
+import { BsFillCheckCircleFill } from 'react-icons/bs';
+import { BsCircleFill } from 'react-icons/bs';
 
 const HomePage = () => {
     const [todos, setTodos] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [checkDone, setCheckDone] = useState(false);
+    const [newTask, setNewTask] = useState('');
 
     // get all tasks
     const getTasks = () => {
@@ -15,36 +16,48 @@ const HomePage = () => {
             .get('http://localhost:5000/getAll')
             .then((res) => {
                 setTodos(res.data);
-                setLoading(false);
+                window.location.reload();
             })
             .catch((err) => {
                 console.log(err);
-                setLoading(false);
             });
     };
 
-    useEffect(() => {
-        getTasks();
-        // const intervalId = setInterval(getTasks, 5000);
-        // return () => clearInterval(intervalId);
-    }, []);
-
     // edit task
-    const handleEditTask = () => {
-        console.log('Edit task');
+    const handleEditTask = (id, newTask) => {
+        setNewTask(...todos, newTask);
+
+        axios
+            .post(`http://localhost:5000/edit/${id}`)
+            .then((res) => {
+                console.log(res);
+                window.location.reload();
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
     // delete task
-    const handleDeleteTask = () => {
-        console.log('Delete task');
+    const handleDeleteTask = (id) => {
+        axios
+            .delete(`http://localhost:5000/delete/${id}`)
+            .then((res) => {
+                console.log(res);
+                window.location.reload();
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
     // checkdone task
     const handleCheckDoneTask = (id) => {
         axios
             .put(`http://localhost:5000/checkdone/${id}`)
-            .then(() => {
-                setCheckDone(!checkDone);
+            .then((res) => {
+                console.log(res);
+                window.location.reload();
             })
             .catch((err) => {
                 console.log(err);
@@ -74,24 +87,34 @@ const HomePage = () => {
                     return (
                         <div
                             key={index}
-                            className='mt-5 bg-black py-3 text-white pl-10 rounded-lg flex justify-between items-center'
+                            className={
+                                todo.checkDone
+                                    ? 'mt-5 bg-blue-500 py-3 text-white pl-10 rounded-lg flex justify-between items-center'
+                                    : 'mt-5 bg-black py-3 text-white pl-10 rounded-lg flex justify-between items-center'
+                            }
                         >
-                            <div className='flex justify-center items-center gap-3'>
+                            <div
+                                onClick={() => handleCheckDoneTask(todo._id)}
+                                className='flex justify-center items-center gap-3'
+                            >
                                 {/* button checkdone */}
-                                <input
-                                    id={inputId}
-                                    checked={todo.checkDone}
-                                    onChange={() => {
-                                        handleCheckDoneTask(todo._id);
-                                    }}
-                                    type='checkbox'
-                                    className='h-5 w-5'
-                                    title='Check this task as done'
-                                />
+                                {todo.checkDone ? (
+                                    <BsFillCheckCircleFill
+                                        className='icon'
+                                        key={inputId}
+                                    />
+                                ) : (
+                                    <BsCircleFill
+                                        className='icon'
+                                        key={inputId}
+                                    />
+                                )}
 
                                 {/* name task */}
                                 <label
-                                    className={todo.done ? 'line-through' : ''}
+                                    className={
+                                        todo.checkDone ? 'line-through' : ''
+                                    }
                                     htmlFor={inputId}
                                 >
                                     {todo.task}
@@ -101,13 +124,13 @@ const HomePage = () => {
                             {/* buttons: edit & delete */}
                             <div className='flex justify-center items-center gap-5 text-black mr-10'>
                                 <CiEdit
-                                    onClick={handleEditTask}
+                                    onClick={() => handleEditTask(todo._id)}
                                     title='Edit this task'
                                     size={35}
                                     className=' bg-white hover:cursor-pointer rounded-lg p-1'
                                 />
                                 <MdDelete
-                                    onClick={handleDeleteTask}
+                                    onClick={() => handleDeleteTask(todo._id)}
                                     title='Delete this task'
                                     size={35}
                                     className=' bg-white hover:cursor-pointer rounded-lg p-1'
