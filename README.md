@@ -1,8 +1,28 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# To do List
+I am using this project to practice my backend coding skills because my goal is to become a full-stack developer. This project currently only has CRUD functionalities, but I plan to develop it further in the future.
 
-Currently, two official plugins are available:
 
--   [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
--   [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Tech Stack
+
+**Client:** React, Vite, TailwindCSS
+
+**Server:** Node, Express, MongoDB
+
+
+## Environment Variables
+
+To run this project, you will need to download file zip or `git clone https://github.com/DucHuy2102/todoList_MERN.git`
+
+After that, you open 2 terminal:
+
++ Terminal 1: `cd frontend` --> `npm i`
++ Terminal 2: `cd backend` --> `npm start` 
+
+That's all for now, hope you enjoy it!
+
+## Authors
+
+- GitHub: [@DucHuy2102](https://github.com/DucHuy2102/)
+- Email: duchuytv2102@gmail.com
+
